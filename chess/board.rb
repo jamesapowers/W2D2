@@ -1,5 +1,5 @@
 
-require_relative 'piece.rb'
+require_relative 'pieces.rb'
 require_relative 'display.rb'
 
 class Board
@@ -26,8 +26,14 @@ attr_accessor :board
   def make_starting_grid(board)
     board.each_with_index do |row, row_idx|
       row.each_with_index do |col, col_idx|
-        #board[row_idx][col_idx] = NullPiece.new unless row_idx == 0 || row_idx == 1 || row_idx == 6 || row_idx == 7
-        board[row_idx][col_idx] = Piece.new(:black,@board,[row_idx, col_idx]) if row_idx == 0 || row_idx == 1 || row_idx == 6 || row_idx == 7
+
+        fill_front_row(:black, board,row_idx, col_idx) if row_idx == 1
+        fill_front_row(:white, board,row_idx, col_idx) if row_idx == 6
+
+        fill_back_row(:black, board,row_idx, col_idx) if row_idx == 0
+        fill_back_row(:white, board,row_idx, col_idx) if row_idx == 7
+
+        board[row_idx][col_idx] = NullPiece.instance unless row_idx == 0 || row_idx == 1 || row_idx == 6 || row_idx == 7
       end
     end
     board
@@ -41,11 +47,16 @@ attr_accessor :board
     end
   end
 
-  def checkmate?()
-
+  def fill_front_row(color, board, row_idx, col_idx)
+    board[row_idx][col_idx] = Pawn.new(color, board,[row_idx, col_idx])
   end
 
-  def find_king(king)
+  def fill_back_row(color, board, row_idx, col_idx)
+    board[row_idx][col_idx] = Rook.new(color, board,[row_idx, col_idx]) if col_idx == 0 || col_idx == 7
+    board[row_idx][col_idx] = Bishop.new(color, board,[row_idx, col_idx]) if col_idx == 2 || col_idx == 5
+    board[row_idx][col_idx] = Knight.new(color, board,[row_idx, col_idx]) if col_idx == 1 || col_idx == 6
+    board[row_idx][col_idx] = King.new(color, board,[row_idx, col_idx]) if col_idx == 4
+    board[row_idx][col_idx] = Queen.new(color, board,[row_idx, col_idx]) if col_idx == 3
   end
 
 end
